@@ -1,78 +1,105 @@
-# QR Attendance System
+# QR Code Attendance System
 
-This project is an end-to-end design and implementation of a QR Attendance System developed using FastAPI, Python, SQLite, and Jinja2 templating. The system automates lecture attendance via time-bound encrypted QR codes, prevents proxy marking through IP and timestamp validation, and provides both teacher and student interfaces for seamless interaction.
+![System Overview](assets/imgs/Screenshot%202026-01-24%20163351.png)
 
-## Features
+This project is a **QR-Based Student Attendance Management System** designed to track and automate the attendance process using dynamic, encrypted QR codes. The focus of this project was to create a secure backend architecture that prevents proxy attendance while keeping the user experience simple.
 
-- **Automated Attendance**: Students scan dynamic QR codes to mark present using their devices.
-- **Secure & Anti-Proxy**:
-  - **Time-Bound**: QR codes expire after a set duration (e.g., 60 seconds).
-  - **Network Validation**: Ensures students are on the same local network as the instructor to prevent remote attendance marking.
-  - **Encryption**: QR tokens are base64-encoded and encrypted with timestamps and course data.
-- **Role-Based Interfaces**:
-  - **Teachers**: Generate QRs, view real-time logs, and manually edit attendance records if needed.
-  - **Students**: Scan QRs, view personal attendance history, and see monthly calendar reports.
-- **Responsive Design**: precise layouts for both mobile and desktop views, including Dark/Light mode support.
+The system utilizes time-bound tokens and network validation to ensure that students must be physically present in the class to mark their attendance.
 
-## System Architecture
+## Key Features
 
-The application is built on a robust, lightweight stack:
-- **Backend**: FastAPI (High-performance Async Python framework).
-- **Database**: SQLite with SQLAlchemy ORM (Zero-configuration storage).
-- **Frontend**: Server-side rendered HTML using Jinja2 templates, styled with custom CSS.
+*   **Dynamic QR Codes**: The system generates unique, encrypted QR codes that expire after a short duration (1-2 minutes), preventing code sharing.
 
-### Workflow
-1.  **Teacher** generates a QR code for a specific course session.
-2.  **Student** logs in and scans the QR code.
-3.  **Server** validates the token (expiry, network check) and marks the student as present in the database.
-4.  **Dashboard** updates instantly to reflect the new record.
+    <div align="center">
+      <img src="assets/imgs/Screenshot%202026-01-24%20163034.png" alt="Dynamic QR Generation" width="600"/>
+      <p><i>Teacher Interface for Generating Dynamic QRs</i></p>
+    </div>
 
-## Installation & Setup
+*   **Anti-Proxy Mechanisms**:
+    *   **Subnet Verification**: Validates that the student's device is connected to the same local network as the instructor.
+    *   **Timestamp Encryption**: Embeds time data within the QR token to prevent replay attacks.
+*   **Role-Based Access Control**:
+    *   **Teachers**: Capabilities include generating session-specific QRs, monitoring real-time attendance logs, and manual override for attendance records.
+    
+    <div align="center">
+      <img src="assets/imgs/Screenshot%202026-01-24%20163007.png" alt="Teacher Dashboard" width="600"/>
+      <p><i>Teacher Dashboard</i></p>
+    </div>
 
-1.  **Clone the Repository**
+    *   **Students**: Streamlined interface to scan QRs and view detailed attendance history and subject-wise logs.
+    
+    <div align="center">
+      <img src="assets/imgs/Screenshot%202026-01-24%20163108.png" alt="Student View" width="600"/>
+      <p><i>Student Attendance History</i></p>
+    </div>
+
+*   **Data Management**: Implements a structured relational database using SQLAlchemy to efficiently handle student data, course mappings, and daily attendance records.
+*   **Streamlined Authentication**: The login process utilizes unique identifiers (Roll Number/Course Code) without password verification. This design choice was made purposely to facilitate rapid testing and evaluation cycles during the development phase.
+
+    <div align="center">
+      <img src="assets/imgs/Screenshot%202026-01-24%20162644.png" alt="Simple Login" width="600"/>
+      <p><i>Streamlined Login Interface</i></p>
+    </div>
+
+## Technology Stack
+
+The project emphasizes backend logic and system security:
+
+*   **Backend**: **FastAPI** (Python) - Utilizing its asynchronous capabilities for high performance.
+*   **Database**: **SQLite** with **SQLAlchemy ORM** - For reliable relational data management.
+*   **Frontend**: Jinja2 Templates (HTML/CSS) - Providing a functional and responsive user interface.
+*   **Security**: Custom implementation of token encryption and network validation logic.
+
+## Installation and Run Instructions
+
+To set up the project locally:
+
+1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/qr_attendance.git
-    cd qr_attendance
+    git clone https://github.com/Pratik0182/qr-attendance-system.git
+    cd qr-attendance-system
     ```
 
-2.  **Install Dependencies**
-    Ensure you have Python 3.9+ installed.
+2.  **Install dependencies**:
+    Ensure Python is installed, then run:
     ```bash
     pip install -r requirements.txt
     ```
 
-3.  **Run the Application**
+3.  **Start the server**:
     ```bash
     uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ```
-    - Access the app at `http://localhost:8000` (or `http://<your-ip>:8000` for mobile scanning).
 
-## Usage
+4.  **Access the application**:
+    Navigate to `http://localhost:8000` in your web browser.
+    *   **Student Login**: Use a registered Roll Number (e.g., `231210066`).
+    *   **Teacher Login**: Select a registered Course Code (e.g., `CSBB 252: Artificial Intelligence`).
 
-### For Teachers
-1.  Go to **Teacher Login** (e.g., use Course Code "Artificial Intelligence").
-2.  Click **QR Attendance** to generate a code for the current class.
-3.  Use **Manual Attendance** to fix any discrepancies.
-4.  View **Dashboard** for overall class statistics.
+## Project Structure
 
-### For Students
-1.  Go to **Student Login** (e.g., use unique Roll Number).
-2.  Go to **Scan QR** to mark attendance.
-3.  Check **My Attendance** for detailed history and percentage.
+*   `main.py`: Core application logic containing API routes, security validation, and database interactions.
+*   `templates/`: HTML templates for the user interface.
+*   `data/`: Directory containing the SQLite database.
+*   `static/`: Static assets including CSS.
+*   `assets/`: Directory containing font files and other static resources.
 
-## Technologies Used
+<div align="center">
+  <img src="assets/imgs/Screenshot%202026-01-24%20163159.png" alt="Logs" width="45%" style="margin-right: 10px;"/>
+  <img src="assets/imgs/Screenshot%202026-01-24%20163140.png" alt="Analytics" width="45%"/>
+  <p><i>Comprehensive Logs and Analytics</i></p>
+</div>
 
--   **Backend Framework**: FastAPI
--   **Templating**: Jinja2
--   **Database**: SQLite / SQLAlchemy
--   **QR Generation**: `qrcode` (Python library)
--   **Server**: Uvicorn
+## Configuration Note
 
-## Database Schema
+The current implementation comes with pre-populated data (specific courses and roll number ranges) tailored to our current academic batch for demonstration and testing purposes.
 
--   **students**: Stores unique roll numbers.
--   **courses**: Stores course codes and active QR session data.
--   **attendances**: Links students and courses with timestamps and presence status.
+These values are defined in the database initialization logic within `main.py` and can be easily modified or integrated with an external student database to adapt the system for other classes or institutions.
 
----
-© 2025 Student Attendance Management System
+## Future Enhancements
+
+*   **Secure Authentication**: While the current version prioritizes testing speed, future iterations will include password-based authentication (Hashing/JWT) for enhanced user security.
+
+## Note
+
+This application was developed to demonstrate secure backend system architecture and automation using Python. The core validation logic housed in `main.py` is the primary focus of this implementation.
