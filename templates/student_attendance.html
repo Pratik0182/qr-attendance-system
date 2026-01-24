@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto; padding: 20px;">
+    <h2>Attendance Record for {{ roll_number }}</h2>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--table-bg, #fff); color: var(--table-text, #222);">
+        <thead>
+            <tr style="background-color: var(--table-header-bg, #f4f4f4); color: var(--table-header-text, #222);">
+                <th style="padding: 10px; border: 1px solid #ddd;">Subject Code</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Total Classes</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Attended</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Attendance %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for code, data in attendance_data.items() %}
+            <tr>
+                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ code }}</td>
+                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ data.total }}</td>
+                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ data.attended }}</td>
+                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ '%.2f'|format(data.percentage) }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Dates Present Per Subject Section -->
+    <div style="margin-top: 40px; background: var(--table-bg, #fff); color: var(--table-text, #222); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); padding: 20px;">
+        <h3 style="font-size: 1.5em;">Dates Present Per Subject</h3>
+        <div style="max-height: 220px; overflow-y: auto;">
+            {% for code, months in present_dates_by_subject_grouped.items() %}
+                <div style="margin-bottom: 25px;">
+                    <strong>{{ code }}:</strong>
+                    {% if months %}
+                        {% for month_label, days in months.items() %}
+                            <div style="margin-left: 15px; margin-top: 8px;">
+                                {{ month_label }}: {{ days|join(', ') }}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="margin-left: 15px; margin-top: 8px; color: #ff0000;">No present dates found.</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+const rollNumber = "{{ roll_number }}";
+const calendarMonth = document.getElementById('calendarMonth');
+const calendarBody = document.getElementById('calendarBody');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+
+let currentYear, currentMonth; // JS month: 0-indexed
+
+function getMonthName(year, month) {
+    const d = new Date(year, month, 1);
+    return d.toLocaleString('default', { month: 'long', year: 'numeric' });
+}
+
+function renderCalendar(year, month) {
+    fetch(`/student/attendance-data/${rollNumber}?year=${year}&month=${month+1}`)
+        .then(res => res.json())
+        .then(data => {
+            calendarMonth.textContent = getMonthName(year, month);
+            calendarBody.innerHTML = '';
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const daysInMonth = lastDayOfMonth.getDate();
+            const startDay = firstDayOfMonth.getDay();
+            let dayCounter = 1; // Proper counter that persists through loops
+            let attendanceMap = {};
+            data.days.forEach(day => attendanceMap[day.day] = day.status);
+            for (let row = 0; row < 6; row++) {
+                const tr = document.createElement('tr');
+                for (let col = 0; col < 7; col++) {
+                    const td = document.createElement('td');
+                    td.style.border = '1px solid #222';
+                    td.style.width = '32px';
+                    td.style.height = '32px';
+                    td.style.textAlign = 'center';
+                    td.style.verticalAlign = 'middle';
+                    td.style.fontSize = '14px';
+                    td.style.fontWeight = 'normal';
+                    if (row === 0 && col < startDay) {
+                        td.textContent = '';
+                        td.style.background = '#fff';
+                    } else if (dayCounter <= daysInMonth) {
+                        td.textContent = dayCounter;
+                        const status = attendanceMap[dayCounter] || 'no-class';
+                        if (status === 'present') {
+                            td.style.backgroundColor = '#27ae60'; // Strong green
+                            td.style.color = '#fff';
+                            td.style.fontWeight = 'bold';
+                        } else if (status === 'absent') {
+                            td.style.backgroundColor = '#ffe6e6';
+                            td.style.color = '#cc0000';
+                            td.style.fontWeight = 'bold';
+                        } else {
+                            td.style.backgroundColor = '#fff';
+                            td.style.color = '#222';
+                        }
+                        dayCounter++;
+                    } else {
+                        td.textContent = '';
+                        td.style.background = '#fff';
+                    }
+                    tr.appendChild(td);
+                }
+                calendarBody.appendChild(tr);
+            }
+        });
+}
+
+function changeMonth(offset) {
+    currentMonth += offset;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    } else if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    renderCalendar(currentYear, currentMonth);
+}
+
+// Initialize to current month
+const today = new Date();
+currentYear = today.getFullYear();
+currentMonth = today.getMonth();
+renderCalendar(currentYear, currentMonth);
+
+prevMonthBtn.onclick = () => changeMonth(-1);
+nextMonthBtn.onclick = () => changeMonth(1);
+</script>
+{% endblock %}

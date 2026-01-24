@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="dark-mode">
+
+<head>
+    <title>Student Attendance Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --nav-bg: #333333;
+            --nav-text: #ffffff;
+            --dropdown-bg: #f9f9f9;
+            --dropdown-text: #000000;
+            --dropdown-hover: #f1f1f1;
+            --table-bg: #fff;
+            --table-text: #222;
+            --table-header-bg: #f4f4f4;
+            --table-header-text: #313131;
+        }
+
+        html.dark-mode {
+            --bg-color: #121212;
+            --text-color: #f5f5f5;
+            --nav-bg: #1e1e1e;
+            --nav-text: #f5f5f5;
+            --dropdown-bg: #23272f;
+            --dropdown-text: #f5f5f5;
+            --dropdown-hover: #333b44;
+            --table-bg: #23272f;
+            --table-text: #f5f5f5;
+            --table-header-bg: #333b44;
+            --table-header-text: #f5f5f5;
+            background-color: var(--bg-color);
+            filter: none;
+        }
+
+        html.dark-mode img,
+        html.dark-mode video,
+        html.dark-mode canvas {
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        @font-face {
+            font-family: 'Century';
+            src: url('/fonts/CENTURY.TTF') format('truetype');
+        }
+
+        .dropdown-content,
+        .dropdown-content a,
+        .dropdown-content div {
+            color: var(--dropdown-text) !important;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--dropdown-hover);
+            color: var(--dropdown-text) !important;
+        }
+
+        .navbar {
+            background: var(--nav-bg);
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            position: relative;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            display: inline;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            right: 10px;
+            top: 12px;
+            background: var(--dropdown-bg);
+            color: var(--dropdown-text);
+            border: 1px solid var(--dropdown-text);
+            border-radius: 6px;
+            padding: 4px 18px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--dropdown-bg);
+            min-width: 180px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 12px 16px;
+            color: var(--dropdown-text);
+            text-decoration: none;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--dropdown-hover);
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .menu-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar" style="display: flex; align-items: center; justify-content: center; position: relative;">
+        <button id="menuButton" class="menu-button"
+            style="color:#f4f4f4; position: absolute; left: 10px; top: 12px;">☰</button>
+        <div class="title"
+            style="margin: 0 auto; font-size: 35px; font-weight: bold; color:#fdfbfb; text-align: center; font-family: 'Century', Arial, sans-serif;">
+            Student Attendance Management System</div>
+        <button id="theme-toggle" class="theme-toggle">Mode: Dark</button>
+    </div>
+
+    <div id="menuDropdown" class="dropdown-content"
+        style="position: absolute; left: 0; top: 50px; width: 240px; max-width: 90vw; background: var(--dropdown-bg); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.18); z-index: 1000; padding: 10px 0;">
+        {% if session_type == 'student' %}
+        <div
+            style="padding:12px 16px; font-weight:bold; color:var(--dropdown-text); cursor:default; border-bottom:1px solid var(--dropdown-hover);">
+            {{ role_info }}</div>
+        {% endif %}
+        <a href="/">Home</a>
+        <a href="/contact">Contact Us</a>
+        {% if session_type == 'student' %}
+        <a href="/student/attendance/{{ roll_number }}">My Attendance</a>
+        <a href="/student/scan-qr/{{ roll_number }}">Scan QR</a>
+        <a href="/logout" target="_self">Logout</a>
+        {% elif session_type == 'teacher' %}
+        <a href="/teacher/dashboard/{{ course_code }}">Dashboard</a>
+        <a href="/teacher/manual-attendance/{{ course_code }}">Manual Attendance</a>
+        <a href="/teacher/qr-attendance/{{ course_code }}">QR Attendance</a>
+        <a href="/logout" target="_self">Logout</a>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('menuButton');
+            const menu = document.getElementById('menuDropdown');
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                menu.classList.toggle('show');
+            });
+            document.addEventListener('click', function (e) {
+                if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                    menu.classList.remove('show');
+                }
+            });
+            // Close menu on navigation (works even if no links or user is not logged in)
+            function closeMenuOnLinks() {
+                Array.from(menu.querySelectorAll('a')).forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        menu.classList.remove('show');
+                    });
+                });
+            }
+            closeMenuOnLinks();
+            // If menu content changes (e.g. after login), re-attach listeners
+            const observer = new MutationObserver(closeMenuOnLinks);
+            observer.observe(menu, { childList: true, subtree: true });
+            // Theme toggle logic
+            const tgl = document.getElementById('theme-toggle');
+            function setThemeLabel() {
+                tgl.textContent = document.documentElement.classList.contains('dark-mode') ? 'Mode: Dark' : 'Mode: Light';
+            }
+            // On load, apply theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark-mode');
+            } else {
+                document.documentElement.classList.add('dark-mode');
+            }
+            setThemeLabel();
+            tgl.addEventListener('click', function () {
+                const isDark = document.documentElement.classList.toggle('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                setThemeLabel();
+            });
+        });
+    </script>
+    <footer style="text-align: center; color: #888; font-size: 15px; margin-top: 60px;">
+        &copy; 2025 Student Attendance Management System
+    </footer>
+</body>
+
+</html>

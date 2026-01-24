@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h2>Manual Attendance - {{ course_code }}</h2>
+    
+    <div style="margin: 20px 0; padding: 20px; background: var(--dropdown-bg); border: 1px solid var(--dropdown-hover); border-radius: 5px; color: var(--dropdown-text);">
+        <h3>Select Date</h3>
+        <form method="post" action="/teacher/manual-attendance/{{ course_code }}" style="display: flex; gap: 10px; align-items: flex-end;">
+            <div>
+                <label for="attendance_date">Date:</label><br>
+                <input type="date" id="attendance_date" name="attendance_date" required 
+                       value="{{ attendance_date if attendance_date else '' }}"
+                       style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <button type="submit" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Load Students
+            </button>
+        </form>
+    </div>
+
+    {% if attendance_date and students %}
+    <div style="margin: 20px 0;">
+        <h3>Mark Attendance for {{ attendance_date }}</h3>
+        <form method="post" action="/teacher/mark-attendance/{{ course_code }}" style="margin-top: 15px;">
+            <input type="hidden" name="attendance_date" value="{{ attendance_date }}">
+            
+            <div style="margin-bottom: 10px;">
+                <button type="button" onclick="selectAll(true)" style="padding: 5px 10px; margin-right: 10px;">Select All</button>
+                <button type="button" onclick="selectAll(false)" style="padding: 5px 10px;">Clear All</button>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: var(--table-header-bg); color: var(--table-header-text);">
+                        <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Roll Number</th>
+                        <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Present</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td style="padding: 12px; border: 1px solid #ddd;">{{ student.roll_number }}</td>
+                        <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">
+                            <input type="checkbox" name="present_{{ student.roll_number }}" 
+                                   class="attendance-checkbox"
+                                   {% if student.is_present %}checked{% endif %}
+                                   style="width: 20px; height: 20px; cursor: pointer;">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="margin-top: 20px; text-align: right;">
+                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Save Attendance
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function selectAll(checked) {
+    document.querySelectorAll('.attendance-checkbox').forEach(checkbox => {
+        checkbox.checked = checked;
+    });
+}
+</script>
+{% endblock %}

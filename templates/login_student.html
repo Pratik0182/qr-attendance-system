@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 400px; margin: 80px auto 0; padding: 20px; display: flex; flex-direction: column; align-items: center;">
+    <h2 style="font-size: 2.2em; font-weight: bold; margin-bottom: 18px;">Student Login</h2>
+    {% if error %}
+    <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
+    {% endif %}
+    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+        <div>
+            <label for="roll_number" style="font-size: 1.3em;">Roll Number:</label><br>
+            <input type="text" id="roll_number" name="roll_number" required 
+                   style="padding: 14px; width: 265px; margin-top: 5px; font-size: 1.3em;"
+                   placeholder="Enter roll number">
+        </div>
+        <div>
+            <button type="submit" 
+                    style="padding: 15px 122px; background-color: #4CAF50; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 1.3em;">
+                Login
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

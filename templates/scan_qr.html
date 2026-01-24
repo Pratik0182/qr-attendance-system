@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; text-align: center;">
+    <h2>Scan QR Code - {{ roll_number }}</h2>
+    
+    {% if error %}
+    <div style="color: red; margin: 20px 0; padding: 10px; background-color: #ffebee; border-radius: 4px;">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div style="color: green; margin: 20px 0; padding: 10px; background-color: #e8f5e9; border-radius: 4px;">
+        {{ success }}
+    </div>
+    {% endif %}
+
+    <div style="margin: 20px 0;">
+        <video id="video" style="width: 100%; max-width: 400px; border: 1px solid #ddd; border-radius: 4px;"></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+
+    <div style="margin: 20px 0;">
+        <form id="manual-form" method="post" action="/student/submit-attendance/{{ roll_number }}" 
+              style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <input type="hidden" id="student_lat" name="student_lat">
+            <input type="hidden" id="student_lon" name="student_lon">
+            <input type="text" id="qr-result" name="qr_token" required 
+                   style="padding: 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px; font-size: 16px;"
+                   placeholder="Enter QR Code manually">
+            <button type="button" onclick="submitWithLocation()" 
+                    style="padding: 12px 24px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 250px; font-size: 16px;">
+                Submit Code
+            </button>
+        </form>
+        <div id="location-status" style="margin-top: 10px; color: #666;"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+let scanning = true;
+
+// Try to access the camera
+navigator.mediaDevices.getUserMedia({ 
+    video: { 
+        facingMode: 'environment',
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+    } 
+})
+.then(function(stream) {
+    video.srcObject = stream;
+    video.setAttribute('playsinline', true); // required for iOS
+    video.play();
+    requestAnimationFrame(tick);
+})
+.catch(function(err) {
+    console.log("Camera access failed:", err);
+    document.getElementById('video').style.display = 'none';
+    document.getElementById('manual-form').style.display = 'flex';
+});
+
+function submitWithLocation() {
+    const statusDiv = document.getElementById('location-status');
+    statusDiv.textContent = 'Getting location...';
+    
+    if (!navigator.geolocation) {
+        statusDiv.textContent = 'Geolocation is not supported by your browser';
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            document.getElementById('student_lat').value = position.coords.latitude;
+            document.getElementById('student_lon').value = position.coords.longitude;
+            document.getElementById('manual-form').submit();
+        },
+        (error) => {
+            statusDiv.textContent = 'Unable to get location. Please allow location access.';
+            console.error('Error getting location:', error);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+        }
+    );
+}
+
+function tick() {
+    if (!scanning) return;
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        
+        if (code) {
+            scanning = false;
+            document.getElementById('qr-result').value = code.data;
+            submitWithLocation();  // Get location before submitting
+            return;
+        }
+    }
+    requestAnimationFrame(tick);
+}
+</script>
+{% endblock %}

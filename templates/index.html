@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 400px; margin: 80px auto 0; padding: 20px; display: flex; align-items: center; justify-content: center;">
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+        <a href="/student/login" style="text-decoration: none;">
+            <div style="padding: 30px; background-color: #4CAF50; color: white; text-align: center; border-radius: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0; font-size: 28px;">Student Login</h2>
+            </div>
+        </a>
+        
+        <a href="/teacher/login" style="text-decoration: none;">
+            <div style="padding: 30px; background-color: #2196F3; color: white; text-align: center; border-radius: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h2 style="margin: 0; font-size: 28px;">Teacher Login</h2>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

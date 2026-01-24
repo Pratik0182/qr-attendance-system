@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h2 style="color: var(--dropdown-text);">QR Attendance - {{ course_code }}</h2>
+    
+    <div style="margin: 20px 0; padding: 20px; background: var(--dropdown-bg); border: 1px solid var(--dropdown-hover); border-radius: 5px; color: var(--dropdown-text);">
+        <h3 style="color: var(--dropdown-text);">Generate QR Code</h3>
+        <form method="post" action="/teacher/generate-qr/{{ course_code }}" style="display: flex; gap: 10px; align-items: flex-end;">
+            <div>
+                <label for="attendance_date" style="color: var(--dropdown-text);">Date:</label><br>
+                <input type="date" id="attendance_date" name="attendance_date" required 
+                       value="{{ today_date }}"
+                       style="padding: 8px; border: 1px solid var(--dropdown-hover); border-radius: 4px; background: var(--dropdown-bg); color: var(--dropdown-text);">
+            </div>
+            <div>
+                <label for="validity_minutes" style="color: var(--dropdown-text);">Valid for:</label><br>
+                <select id="validity_minutes" name="validity_seconds" required 
+                        style="padding: 8px; border: 1px solid var(--dropdown-hover); border-radius: 4px; background: var(--dropdown-bg); color: var(--dropdown-text);">
+                    <option value="60">1 minute</option>
+                    <option value="120">2 minutes</option>
+                </select>
+            </div>
+            <button type="submit" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Generate New QR
+            </button>
+        </form>
+    </div>
+
+    {% if qr_code %}
+    <div style="margin: 20px 0; text-align: center; padding: 20px; border: 1px solid var(--dropdown-hover); border-radius: 5px; background-color: var(--dropdown-bg);">
+        <h3 style="color: var(--dropdown-text);">Active QR Code</h3>
+        <p style="color: var(--dropdown-text); margin-bottom: 15px;">Valid until: {{ qr_expiry }}</p>
+        <div style="background: var(--dropdown-bg); padding: 20px; display: inline-block; border-radius: 5px;">
+            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" 
+                 style="max-width: 300px; width: 100%; height: auto; display: block; margin: 0 auto;">
+        </div>
+        <p style="color: var(--dropdown-text); margin-top: 15px;">Students must be on the same network to mark attendance</p>
+    </div>
+    {% endif %}
+
+    {% if attendance_records %}
+    <div style="margin: 20px 0;">
+        <h3 style="color: var(--dropdown-text);">Attendance for {{ selected_date }}</h3>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                    <tr style="background-color: var(--table-header-bg); color: var(--table-header-text);">
+                        <th style="padding: 12px; text-align: left; border: 1px solid var(--dropdown-hover);">Roll Number</th>
+                        <th style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover);">Status</th>
+                        <th style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover);">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records %}
+                    <tr>
+                        <td style="padding: 12px; border: 1px solid var(--dropdown-hover); color: var(--dropdown-text);">{{ record.roll_number }}</td>
+                        <td style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover); color: var(--dropdown-text);">
+                            {% if record.present %}
+                            <span style="color: var(--success-color);">Present</span>
+                            {% else %}
+                            <span style="color: var(--error-color);">Absent</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover); color: var(--dropdown-text);">
+                            {{ record.time if record.present else '-' }}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-refresh the page every 30 seconds to update attendance records
+setInterval(function() {
+    if (!document.hidden) {  // Only refresh if page is visible
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}

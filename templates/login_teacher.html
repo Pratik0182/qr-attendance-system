@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div
+    style="max-width: 400px; margin: 80px auto 0; padding: 20px; display: flex; flex-direction: column; align-items: center;">
+    <h2 style="font-size: 2.2em; font-weight: bold; margin-bottom: 18px;">Teacher Login</h2>
+    {% if error %}
+    <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
+    {% endif %}
+    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
+        <div>
+            <label for="course_code" style="font-size: 1.3em;">Course Code:</label><br>
+            <select id="course_code" name="course_code" required
+                style="padding: 14px; width: 260px; margin-top: 5px; font-size: 1.3em;">
+                <option value="">Select Course Code</option>
+                <option value="CSBB 251: Computer Architecture and Organization">CSBB 251: Computer Architecture and
+                    Organization</option>
+                <option value="CSBB 252: Artificial Intelligence">CSBB 252: Artificial Intelligence</option>
+                <option value="CSBB 254: Software Engineering">CSBB 254: Software Engineering</option>
+                <option value="HMBB 251: Professional Communication">HMBB 251: Professional Communication</option>
+                <option value="ECBB 254: Communication Systems">ECBB 254: Communication Systems</option>
+                <option value="CSPB 200: Project II">CSPB 200: Project II</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit"
+                style="padding: 15px 110px; background-color: #2196F3; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 1.15em;">
+                Login
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
