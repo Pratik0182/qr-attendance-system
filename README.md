@@ -1,4 +1,4 @@
-# QR Code Attendance System
+# QR Attendance System
 
 ![System Overview](assets/imgs/Screenshot%202026-01-24%20163351.png)
 
