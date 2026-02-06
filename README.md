@@ -102,4 +102,6 @@ These values are defined in the database initialization logic within `main.py` a
 
 ## Note
 
-This application was developed to demonstrate secure backend system architecture and automation using Python. The core validation logic housed in `main.py` is the primary focus of this implementation.
+This project is intentionally designed as a backend focused system(i worked on backend btw) to demonstrate secure API design, validating logic and database modeling.
+The application is run locally (localhost), ofc you wont click the local host link...
+
