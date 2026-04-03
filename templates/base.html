@@ -1,75 +1,102 @@
 <!DOCTYPE html>
 <html class="dark-mode">
-
 <head>
-    <title>Student Attendance Management System</title>
+    <title>QR Attendance System | NIT Delhi</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --nav-bg: #333333;
-            --nav-text: #ffffff;
-            --dropdown-bg: #f9f9f9;
-            --dropdown-text: #000000;
-            --dropdown-hover: #f1f1f1;
-            --table-bg: #fff;
-            --table-text: #222;
-            --table-header-bg: #f4f4f4;
-            --table-header-text: #313131;
+            /* Light Mode Tokens */
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --nav-bg: #1e293b;
+            --nav-text: #f8fafc;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --dropdown-bg: #ffffff;
+            --dropdown-text: #1e293b;
+            --dropdown-hover: #f1f5f9;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --table-bg: #ffffff;
+            --table-text: #334155;
+            --table-header-bg: #f1f5f9;
+            --table-header-text: #475569;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         html.dark-mode {
-            --bg-color: #121212;
-            --text-color: #f5f5f5;
-            --nav-bg: #1e1e1e;
-            --nav-text: #f5f5f5;
-            --dropdown-bg: #23272f;
-            --dropdown-text: #f5f5f5;
-            --dropdown-hover: #333b44;
-            --table-bg: #23272f;
-            --table-text: #f5f5f5;
-            --table-header-bg: #333b44;
-            --table-header-text: #f5f5f5;
-            background-color: var(--bg-color);
-            filter: none;
+            /* Dark Mode Tokens */
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --nav-bg: #1e293b;
+            --nav-text: #f8fafc;
+            --accent-color: #3b82f6;
+            --accent-hover: #60a5fa;
+            --dropdown-bg: #1e293b;
+            --dropdown-text: #f8fafc;
+            --dropdown-hover: #334155;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --table-bg: #1e293b;
+            --table-text: #e2e8f0;
+            --table-header-bg: #334155;
+            --table-header-text: #f8fafc;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        html.dark-mode img,
-        html.dark-mode video,
-        html.dark-mode canvas {
-            filter: invert(1) hue-rotate(180deg);
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-        }
-
-        @font-face {
-            font-family: 'Century';
-            src: url('/assets/CENTURY.TTF') format('truetype');
-        }
-
-        .dropdown-content,
-        .dropdown-content a,
-        .dropdown-content div {
-            color: var(--dropdown-text) !important;
-        }
-
-        .dropdown-content a:hover {
-            background: var(--dropdown-hover);
-            color: var(--dropdown-text) !important;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .navbar {
             background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
-            padding: 10px 20px;
-            position: relative;
+            justify-content: space-between;
+            padding: 0 20px;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--nav-text);
+            letter-spacing: -0.02em;
         }
 
         .menu-button {
@@ -77,33 +104,59 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            display: inline;
+            color: var(--nav-text);
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .menu-button:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .theme-toggle {
-            position: absolute;
-            right: 10px;
-            top: 12px;
-            background: var(--dropdown-bg);
-            color: var(--dropdown-text);
-            border: 1px solid var(--dropdown-text);
-            border-radius: 6px;
-            padding: 4px 18px;
-            font-size: 15px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 14px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0);
         }
 
         .dropdown-content {
             display: none;
             position: absolute;
-            top: 100%;
-            left: 0;
+            top: 56px;
+            left: 12px;
             background: var(--dropdown-bg);
-            min-width: 180px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
+            width: 260px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--card-border);
+            z-index: 1100;
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .dropdown-content.show {
@@ -112,111 +165,160 @@
 
         .dropdown-content a {
             display: block;
-            padding: 12px 16px;
+            padding: 12px 20px;
             color: var(--dropdown-text);
             text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
         }
 
         .dropdown-content a:hover {
             background: var(--dropdown-hover);
+            color: var(--accent-color);
+        }
+
+        .dropdown-header {
+            padding: 14px 20px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-color);
+            background: var(--dropdown-hover);
+            border-bottom: 1px solid var(--card-border);
         }
 
         .content {
-            padding: 20px;
+            flex: 1;
+            padding: 0;
+            width: 100%;
+            margin: 0 auto;
         }
 
-        .menu-button {
-            background: none;
+        .footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            padding: 40px 20px;
+            margin-top: auto;
+        }
+
+        /* Reusable Card Styles */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            padding: 24px;
+        }
+
+        /* Utility buttons */
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
             border: none;
-            font-size: 24px;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        html.dark-mode img,
+        html.dark-mode video,
+        html.dark-mode canvas {
+            filter: none;
         }
     </style>
 </head>
-
 <body>
-    <div class="navbar" style="display: flex; align-items: center; justify-content: center; position: relative;">
-        <button id="menuButton" class="menu-button"
-            style="color:#f4f4f4; position: absolute; left: 10px; top: 12px;">☰</button>
-        <div class="title"
-            style="margin: 0 auto; font-size: 35px; font-weight: bold; color:#fdfbfb; text-align: center; font-family: 'Century', Arial, sans-serif;">
-            Student Attendance Management System</div>
-        <button id="theme-toggle" class="theme-toggle">Mode: Dark</button>
+    <div class="navbar">
+        <div class="nav-left">
+            <button id="menuButton" class="menu-button">☰</button>
+            <div class="nav-title">QR Attendance</div>
+        </div>
+        <button id="theme-toggle" class="theme-toggle">Light Mode</button>
     </div>
 
-    <div id="menuDropdown" class="dropdown-content"
-        style="position: absolute; left: 0; top: 50px; width: 240px; max-width: 90vw; background: var(--dropdown-bg); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.18); z-index: 1000; padding: 10px 0;">
-        {% if session_type == 'student' %}
-        <div
-            style="padding:12px 16px; font-weight:bold; color:var(--dropdown-text); cursor:default; border-bottom:1px solid var(--dropdown-hover);">
-            {{ role_info }}</div>
+    <div id="menuDropdown" class="dropdown-content">
+        {% if session_type == 'student' or session_type == 'teacher' %}
+            <div class="dropdown-header">{{ role_info }}</div>
         {% endif %}
+        
         <a href="/">Home</a>
+        <a href="/about">About Us</a>
         <a href="/contact">Contact Us</a>
+        
         {% if session_type == 'student' %}
-        <a href="/student/attendance/{{ roll_number }}">My Attendance</a>
-        <a href="/student/scan-qr/{{ roll_number }}">Scan QR</a>
-        <a href="/logout" target="_self">Logout</a>
+            <a href="/student/attendance/{{ roll_number }}">My Attendance</a>
+            <a href="/student/scan-qr/{{ roll_number }}">Scan QR</a>
+            <a href="/logout">Logout</a>
         {% elif session_type == 'teacher' %}
-        <a href="/teacher/dashboard/{{ course_code }}">Dashboard</a>
-        <a href="/teacher/manual-attendance/{{ course_code }}">Manual Attendance</a>
-        <a href="/teacher/qr-attendance/{{ course_code }}">QR Attendance</a>
-        <a href="/logout" target="_self">Logout</a>
+            <a href="/teacher/dashboard/{{ course_code }}">Dashboard</a>
+            <a href="/teacher/manual-attendance/{{ course_code }}">Manual Attendance</a>
+            <a href="/teacher/qr-attendance/{{ course_code }}">QR Attendance</a>
+            <a href="/logout">Logout</a>
         {% endif %}
     </div>
 
-    <div class="content">
+    <main class="content">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <footer class="footer">
+        <div>&copy; 2025 National Institute of Technology Delhi</div>
+        <div style="font-size: 12px; margin-top: 4px; opacity: 0.6;">Developed by Shazin, Nithin & Pratik</div>
+    </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const btn = document.getElementById('menuButton');
-            const menu = document.getElementById('menuDropdown');
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                menu.classList.toggle('show');
-            });
-            document.addEventListener('click', function (e) {
-                if (!btn.contains(e.target) && !menu.contains(e.target)) {
-                    menu.classList.remove('show');
-                }
-            });
-            // Close menu on navigation (works even if no links or user is not logged in)
-            function closeMenuOnLinks() {
-                Array.from(menu.querySelectorAll('a')).forEach(function (link) {
-                    link.addEventListener('click', function () {
-                        menu.classList.remove('show');
-                    });
-                });
-            }
-            closeMenuOnLinks();
-            // If menu content changes (e.g. after login), re-attach listeners
-            const observer = new MutationObserver(closeMenuOnLinks);
-            observer.observe(menu, { childList: true, subtree: true });
-            // Theme toggle logic
-            const tgl = document.getElementById('theme-toggle');
-            function setThemeLabel() {
-                tgl.textContent = document.documentElement.classList.contains('dark-mode') ? 'Mode: Dark' : 'Mode: Light';
-            }
-            // On load, apply theme from localStorage
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.documentElement.classList.remove('dark-mode');
-            } else {
-                document.documentElement.classList.add('dark-mode');
-            }
-            setThemeLabel();
-            tgl.addEventListener('click', function () {
-                const isDark = document.documentElement.classList.toggle('dark-mode');
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                setThemeLabel();
-            });
+    document.addEventListener('DOMContentLoaded', function(){
+        const btn = document.getElementById('menuButton');
+        const menu = document.getElementById('menuDropdown');
+        
+        btn.addEventListener('click', function(e){
+            e.stopPropagation();
+            menu.classList.toggle('show');
         });
-    </script>
-    <footer style="text-align: center; color: #888; font-size: 15px; margin-top: 60px;">
-        &copy; 2025 Student Attendance Management System
-    </footer>
-</body>
 
+        document.addEventListener('click', function(e){
+            if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+        });
+
+        // Theme toggle logic
+        const tgl = document.getElementById('theme-toggle');
+        
+        function updateThemeElements() {
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            tgl.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        }
+
+        // On load
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark-mode');
+        } else {
+            document.documentElement.classList.add('dark-mode');
+        }
+        updateThemeElements();
+
+        tgl.addEventListener('click', function(){
+            const isDarkNow = document.documentElement.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
+            updateThemeElements();
+        });
+    });
+    </script>
+</body>
 </html>

@@ -1,10 +1,709 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    .about-row { display: flex; justify-content: center; gap: 20px; margin-top: 50px; }
-    .about-row span { font-size: 18px; color: #333; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
+    .about-wrapper {
+        font-family: 'Inter', Arial, sans-serif;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px 100px;
+        color: var(--text-color);
+    }
+
+    /* ── Hero ─────────────────────────────────── */
+    .about-hero {
+        text-align: center;
+        padding: 70px 30px 50px;
+        background: linear-gradient(135deg, #0d0d1a 0%, #0f1e3d 50%, #0b2a5c 100%);
+        border-radius: 24px;
+        margin-bottom: 64px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(33,150,243,0.15);
+    }
+    .about-hero::before {
+        content: '';
+        position: absolute;
+        top: -60%; left: -40%;
+        width: 180%; height: 220%;
+        background: radial-gradient(ellipse, rgba(33,150,243,0.18) 0%, transparent 65%);
+        animation: heroPulse 5s ease-in-out infinite alternate;
+    }
+    .about-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -20px; right: -20px;
+        width: 200px; height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(76,175,80,0.12) 0%, transparent 70%);
+        animation: heroPulse 4s 1s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes heroPulse {
+        from { transform: scale(0.85); opacity: 0.5; }
+        to   { transform: scale(1.15); opacity: 1; }
+    }
+    .about-hero h1 {
+        font-size: clamp(2em, 5vw, 3.4em);
+        font-weight: 900;
+        color: #fff;
+        margin: 0 0 16px;
+        letter-spacing: -1px;
+        position: relative;
+        z-index: 2;
+        text-shadow: 0 2px 20px rgba(33,150,243,0.4);
+    }
+    .about-hero h1 span { color: #42a5f5; }
+    .about-hero .tagline {
+        font-size: 1.2em;
+        color: #90caf9;
+        margin: 0 0 8px;
+        position: relative;
+        z-index: 2;
+        font-weight: 400;
+    }
+    .about-hero .sub-tagline {
+        font-size: 0.95em;
+        color: #a0b4c8;
+        margin: 0 0 30px;
+        position: relative;
+        z-index: 2;
+    }
+    .badge-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 2;
+    }
+    .badge {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.22);
+        color: #e3f2fd;
+        border-radius: 50px;
+        padding: 7px 18px;
+        font-size: 0.83em;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        transition: background 0.2s, transform 0.2s;
+    }
+    .badge:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+
+    /* ── Stats bar ────────────────────────────── */
+    .stats-bar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 70px;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 36px rgba(0,0,0,0.22);
+    }
+    .stat-item {
+        flex: 1;
+        text-align: center;
+        padding: 30px 10px;
+        background: var(--dropdown-bg);
+        border-right: 1px solid var(--dropdown-hover);
+        transition: background 0.2s, transform 0.2s;
+        cursor: default;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item:hover { background: var(--dropdown-hover); transform: scale(1.03); }
+    .stat-num {
+        font-size: 2.4em;
+        font-weight: 900;
+        color: #2196F3;
+        display: block;
+        line-height: 1;
+        margin-bottom: 6px;
+        font-variant-numeric: tabular-nums;
+    }
+    .stat-num.green { color: #4CAF50; }
+    .stat-num.orange { color: #FF9800; }
+    .stat-num.red { color: #f44336; }
+    .stat-label {
+        font-size: 0.78em;
+        color: var(--text-color);
+        opacity: 0.68;
+        margin-top: 2px;
+        font-weight: 500;
+    }
+
+    /* ── Section titles ───────────────────────── */
+    .section-title {
+        font-size: 1.55em;
+        font-weight: 800;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, #2196F3, transparent);
+        border-radius: 2px;
+    }
+
+    /* ── Mission box ──────────────────────────── */
+    .mission-box {
+        background: linear-gradient(135deg, #0d47a1 0%, #1565C0 60%, #0288d1 100%);
+        border-radius: 20px;
+        padding: 44px 40px;
+        margin-bottom: 70px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(13,71,161,0.35);
+    }
+    .mission-box::before {
+        content: '🎯';
+        position: absolute;
+        right: 30px; top: 30px;
+        font-size: 5em;
+        opacity: 0.12;
+    }
+    .mission-box h3 { font-size: 1.5em; font-weight: 800; margin: 0 0 16px; }
+    .mission-box p { line-height: 1.9; opacity: 0.93; font-size: 1.02em; margin: 0; }
+
+    /* ── Problem/Solution split ───────────────── */
+    .ps-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 70px;
+    }
+    @media(max-width: 680px) { .ps-grid { grid-template-columns:1fr; } }
+    .ps-card {
+        border-radius: 18px;
+        padding: 32px 28px;
+        position: relative;
+        overflow: hidden;
+    }
+    .ps-card.problem {
+        background: linear-gradient(135deg, #1a0000, #2d0000);
+        border: 1px solid rgba(244,67,54,0.3);
+    }
+    .ps-card.solution {
+        background: linear-gradient(135deg, #001a00, #00280a);
+        border: 1px solid rgba(76,175,80,0.3);
+    }
+    .ps-card h4 { font-size: 1.1em; font-weight: 800; margin: 0 0 16px; color: #fff; }
+    .ps-card h4.red { color: #ff7043; }
+    .ps-card h4.green { color: #66bb6a; }
+    .ps-list { list-style: none; padding: 0; margin: 0; }
+    .ps-list li { color: rgba(255,255,255,0.8); font-size: 0.93em; line-height: 1.7; padding: 4px 0; }
+    .ps-list li::before { margin-right: 8px; }
+    .ps-card.problem .ps-list li::before { content: '✗'; color: #f44336; }
+    .ps-card.solution .ps-list li::before { content: '✓'; color: #4CAF50; }
+
+    /* ── Features grid ────────────────────────── */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 70px;
+    }
+    .feature-card {
+        background: var(--dropdown-bg);
+        border: 1px solid var(--dropdown-hover);
+        border-radius: 16px;
+        padding: 26px 22px;
+        transition: transform 0.22s, box-shadow 0.22s;
+        position: relative;
+        overflow: hidden;
+    }
+    .feature-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #2196F3, #4CAF50);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s;
+    }
+    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(33,150,243,0.15); }
+    .feature-card:hover::after { transform: scaleX(1); }
+    .feature-icon { font-size: 2.1em; margin-bottom: 12px; display: block; }
+    .feature-title { font-weight: 700; font-size: 1em; margin-bottom: 8px; color: var(--text-color); }
+    .feature-desc { font-size: 0.86em; color: var(--text-color); opacity: 0.72; line-height: 1.65; }
+
+    /* ── Tech stack ───────────────────────────── */
+    .tech-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 70px;
+    }
+    .tech-chip {
+        background: var(--dropdown-bg);
+        border: 1px solid var(--dropdown-hover);
+        border-radius: 50px;
+        padding: 10px 22px;
+        font-size: 0.88em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        cursor: default;
+    }
+    .tech-chip:hover {
+        background: var(--dropdown-hover);
+        transform: scale(1.05) translateY(-2px);
+        box-shadow: 0 6px 20px rgba(33,150,243,0.12);
+    }
+
+    /* ── How it works ─────────────────────────── */
+    .how-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0;
+        margin-bottom: 70px;
+        position: relative;
+    }
+    .how-step {
+        text-align: center;
+        padding: 28px 16px;
+        position: relative;
+    }
+    .how-step:not(:last-child)::after {
+        content: '→';
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.4em;
+        color: #2196F3;
+        opacity: 0.6;
+    }
+    @media(max-width: 600px) { .how-step:not(:last-child)::after { display: none; } }
+    .how-num {
+        width: 48px; height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1565C0, #2196F3);
+        color: #fff;
+        font-weight: 900;
+        font-size: 1.2em;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 14px;
+        box-shadow: 0 4px 16px rgba(33,150,243,0.35);
+    }
+    .how-label { font-weight: 700; font-size: 0.92em; color: var(--text-color); margin-bottom: 6px; }
+    .how-desc { font-size: 0.81em; color: var(--text-color); opacity: 0.65; line-height: 1.5; }
+
+    /* ── Team cards ───────────────────────────── */
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 28px;
+        margin-bottom: 70px;
+    }
+    .team-card {
+        background: var(--dropdown-bg);
+        border: 1px solid var(--dropdown-hover);
+        border-radius: 20px;
+        padding: 36px 28px;
+        text-align: center;
+        transition: transform 0.25s, box-shadow 0.25s;
+        position: relative;
+        overflow: hidden;
+    }
+    .team-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+    }
+    .team-card:nth-child(1)::before { background: linear-gradient(90deg,#2196F3,#03a9f4); }
+    .team-card:nth-child(2)::before { background: linear-gradient(90deg,#9c27b0,#e91e63); }
+    .team-card:nth-child(3)::before { background: linear-gradient(90deg,#4CAF50,#8bc34a); }
+    .team-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 48px rgba(33,150,243,0.18);
+    }
+    .team-avatar {
+        width: 86px; height: 86px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.2em;
+        font-weight: 900;
+        color: white;
+        margin: 0 auto 18px;
+        box-shadow: 0 6px 22px rgba(0,0,0,0.3);
+        position: relative;
+    }
+    .team-card:nth-child(1) .team-avatar { background: linear-gradient(135deg,#1565C0,#03a9f4); }
+    .team-card:nth-child(2) .team-avatar { background: linear-gradient(135deg,#7b1fa2,#e91e63); }
+    .team-card:nth-child(3) .team-avatar { background: linear-gradient(135deg,#2e7d32,#66bb6a); }
+    .team-name {
+        font-size: 1.18em;
+        font-weight: 800;
+        margin-bottom: 4px;
+        color: var(--text-color);
+    }
+    .team-role-title {
+        font-size: 0.82em;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+    }
+    .team-card:nth-child(1) .team-role-title { color: #42a5f5; }
+    .team-card:nth-child(2) .team-role-title { color: #ce93d8; }
+    .team-card:nth-child(3) .team-role-title { color: #81c784; }
+    .team-institution {
+        font-size: 0.84em;
+        color: var(--text-color);
+        opacity: 0.72;
+        line-height: 1.6;
+        margin-bottom: 16px;
+    }
+    .team-institution strong { opacity: 1; color: var(--text-color); }
+    .team-skills {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+    }
+    .skill-pill {
+        font-size: 0.73em;
+        font-weight: 600;
+        border-radius: 50px;
+        padding: 3px 10px;
+        background: var(--dropdown-hover);
+        color: var(--text-color);
+        opacity: 0.85;
+    }
+
+    /* ── NIT Delhi box ────────────────────────── */
+    .nit-box {
+        background: var(--dropdown-bg);
+        border: 1px solid var(--dropdown-hover);
+        border-radius: 20px;
+        padding: 36px 32px;
+        margin-bottom: 70px;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
+    @media(max-width: 600px) { .nit-box { flex-direction: column; text-align: center; } }
+    .nit-emblem {
+        font-size: 4.5em;
+        flex-shrink: 0;
+        filter: drop-shadow(0 4px 12px rgba(33,150,243,0.3));
+    }
+    .nit-info h3 { font-size: 1.25em; font-weight: 800; margin: 0 0 8px; color: var(--text-color); }
+    .nit-info p { font-size: 0.92em; color: var(--text-color); opacity: 0.75; line-height: 1.75; margin: 0; }
+    .nit-info .nit-badge {
+        display: inline-block;
+        margin-top: 12px;
+        background: linear-gradient(135deg,#0d47a1,#1565C0);
+        color: #e3f2fd;
+        border-radius: 50px;
+        padding: 5px 16px;
+        font-size: 0.78em;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    /* ── CTA footer strip ─────────────────────── */
+    .cta-strip {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 20px;
+        padding: 40px 32px;
+        text-align: center;
+        color: #fff;
+        border: 1px solid rgba(33,150,243,0.2);
+    }
+    .cta-strip h3 { font-size: 1.5em; font-weight: 800; margin: 0 0 12px; }
+    .cta-strip p { opacity: 0.75; font-size: 1em; margin: 0 0 24px; line-height: 1.7; }
+    .cta-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #1565C0, #2196F3);
+        color: #fff;
+        border-radius: 50px;
+        padding: 13px 32px;
+        font-size: 0.95em;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 6px 24px rgba(33,150,243,0.35);
+    }
+    .cta-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(33,150,243,0.45); }
 </style>
-<div class="about-row">
-    <span>Developed by the Student Attendance Management System Team.</span>
+
+<div class="about-wrapper">
+
+    <!-- ── Hero ─────────────────────────────── -->
+    <div class="about-hero">
+        <h1>QR <span>Attendance</span> System</h1>
+        <p class="tagline">Eliminating proxy attendance — cryptographically, permanently.</p>
+        <p class="sub-tagline">Built at NIT Delhi · Batch 2023–27 · B.Tech Computer Science & Engineering</p>
+        <div class="badge-row">
+            <span class="badge">🎓 NIT Delhi</span>
+            <span class="badge">🔒 Anti-Proxy Secured</span>
+            <span class="badge">⚡ FastAPI Powered</span>
+            <span class="badge">🕐 Time-Bound QR</span>
+            <span class="badge">🌐 Subnet Validation</span>
+            <span class="badge">🔑 HMAC-SHA256</span>
+        </div>
+    </div>
+
+    <!-- ── Stats bar ─────────────────────────── -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-num">33+</span>
+            <div class="stat-label">Students Tracked</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num green">6</span>
+            <div class="stat-label">Active Courses</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num orange">60s</span>
+            <div class="stat-label">QR Expiry Window</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num red">0</span>
+            <div class="stat-label">Proxy Attempts Allowed</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">3</span>
+            <div class="stat-label">Core Developers</div>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num green">100%</span>
+            <div class="stat-label">Attendance Accuracy</div>
+        </div>
+    </div>
+
+    <!-- ── Mission ───────────────────────────── -->
+    <div class="mission-box">
+        <h3>🚀 Our Mission</h3>
+        <p>
+            Traditional paper-based attendance is slow, error-prone, and trivially exploitable — any student can sign for an absent friend in seconds.
+            We set out to build a system that makes proxy attendance <em>physically and mathematically impossible</em>.
+            The result is a platform that combines cryptographically signed, time-bound QR codes with subnet-level Wi-Fi network
+            validation and session-aware role-based access control. Every scan is verified against three independent axes:
+            <strong>time</strong> (is the QR still valid?), <strong>network</strong> (is the device on the classroom Wi-Fi?),
+            and <strong>identity</strong> (is the session authenticated?). Miss any one of them and attendance is rejected.
+            No workarounds. No loopholes.
+        </p>
+    </div>
+
+    <!-- ── Problem vs Solution ───────────────── -->
+    <div class="section-title">⚔️ Problem vs. Solution</div>
+    <div class="ps-grid">
+        <div class="ps-card problem">
+            <h4 class="red">❌ Before — The Old Way</h4>
+            <ul class="ps-list">
+                <li>Paper registers: friends sign for each other</li>
+                <li>Manual data entry errors and lost sheets</li>
+                <li>No real-time attendance visibility</li>
+                <li>Teachers can't verify identity on the spot</li>
+                <li>Static screenshots of QR codes shared on WhatsApp</li>
+                <li>No audit trail or tamper detection</li>
+                <li>Percentage calculations done manually in Excel</li>
+            </ul>
+        </div>
+        <div class="ps-card solution">
+            <h4 class="green">✅ After — Our System</h4>
+            <ul class="ps-list">
+                <li>QR changes every 60 s — screenshots are useless</li>
+                <li>HMAC signature — forging a token is infeasible</li>
+                <li>Real-time dashboard updated per scan</li>
+                <li>Session-bound login — no anonymous access</li>
+                <li>Subnet check — must be on classroom Wi-Fi</li>
+                <li>Full DB audit trail per student per date</li>
+                <li>Live percentage charts updated automatically</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ── How It Works ─────────────────────── -->
+    <div class="section-title">⚙️ How It Works</div>
+    <div class="how-grid" style="background:var(--dropdown-bg);border-radius:18px;margin-bottom:70px;border:1px solid var(--dropdown-hover);">
+        <div class="how-step">
+            <div class="how-num">1</div>
+            <div class="how-label">Teacher Logs In</div>
+            <div class="how-desc">Selects course, chooses date, sets QR validity window (60–300 s)</div>
+        </div>
+        <div class="how-step">
+            <div class="how-num">2</div>
+            <div class="how-label">QR Generated</div>
+            <div class="how-desc">Server signs a token with HMAC-SHA256 containing timestamp, IP & course code</div>
+        </div>
+        <div class="how-step">
+            <div class="how-num">3</div>
+            <div class="how-label">Student Scans</div>
+            <div class="how-desc">In-browser camera (jsQR) reads the code — no third-party app needed</div>
+        </div>
+        <div class="how-step">
+            <div class="how-num">4</div>
+            <div class="how-label">Triple Validation</div>
+            <div class="how-desc">Server checks expiry, CIDR subnet match, and token signature simultaneously</div>
+        </div>
+        <div class="how-step">
+            <div class="how-num">5</div>
+            <div class="how-label">DB Updated</div>
+            <div class="how-desc">Attendance record committed — visible instantly on teacher dashboard</div>
+        </div>
+    </div>
+
+    <!-- ── Key Features ──────────────────────── -->
+    <div class="section-title">✨ Key Features</div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <span class="feature-icon">🔐</span>
+            <div class="feature-title">HMAC-SHA256 Signed Tokens</div>
+            <div class="feature-desc">Every QR payload is signed with a server-side secret. Tampered or forged tokens are rejected instantly — no exceptions.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🌐</span>
+            <div class="feature-title">CIDR Subnet Validation</div>
+            <div class="feature-desc">Uses Python's <code>ipaddress</code> module for precise /24 subnet matching. Students must be on the same classroom Wi-Fi as their teacher.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">⏱️</span>
+            <div class="feature-title">Time-Bound QR Codes</div>
+            <div class="feature-desc">QR codes expire in as little as 60 seconds. A screenshot shared on WhatsApp is already dead by the time it's opened.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">👩‍🏫</span>
+            <div class="feature-title">Role-Based Access Control</div>
+            <div class="feature-desc">Teachers generate QRs and view all records. Students can only see their own attendance — IDOR vulnerabilities are structurally impossible.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">📋</span>
+            <div class="feature-title">Manual Attendance Override</div>
+            <div class="feature-desc">Teachers can correct any date's attendance manually — medical leaves, system issues, and edge cases all handled gracefully.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">📅</span>
+            <div class="feature-title">Live Attendance History</div>
+            <div class="feature-desc">Students see a per-subject attendance breakdown with exact counts, percentages, and colour-coded date history.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">📸</span>
+            <div class="feature-title">No App Required</div>
+            <div class="feature-desc">QR scanning runs fully in-browser via jsQR and the WebRTC Camera API. Students just open the website — nothing to install.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🌙</span>
+            <div class="feature-title">Dark / Light Mode</div>
+            <div class="feature-desc">A polished theme toggle with localStorage persistence. Your preference is remembered across sessions and pages.</div>
+        </div>
+        <div class="feature-card">
+            <span class="feature-icon">🛡️</span>
+            <div class="feature-title">bcrypt Password Hashing</div>
+            <div class="feature-desc">All credentials are stored as bcrypt hashes with salting. Even a full DB dump reveals nothing useful to an attacker.</div>
+        </div>
+    </div>
+
+    <!-- ── Tech Stack ────────────────────────── -->
+    <div class="section-title">🛠️ Technology Stack</div>
+    <div class="tech-grid">
+        <div class="tech-chip">⚡ FastAPI (Python 3.11)</div>
+        <div class="tech-chip">🗄️ SQLite + SQLAlchemy ORM</div>
+        <div class="tech-chip">🔑 bcrypt Password Hashing</div>
+        <div class="tech-chip">🔏 HMAC-SHA256 Token Signing</div>
+        <div class="tech-chip">🎨 Jinja2 + Vanilla CSS</div>
+        <div class="tech-chip">📸 jsQR (In-browser QR Scanner)</div>
+        <div class="tech-chip">🍪 Starlette Session Middleware</div>
+        <div class="tech-chip">🌐 Python ipaddress (CIDR)</div>
+        <div class="tech-chip">🖼️ qrcode + Pillow (QR Gen)</div>
+        <div class="tech-chip">🌙 CSS Custom Properties (Theming)</div>
+        <div class="tech-chip">🔄 Uvicorn ASGI Server</div>
+        <div class="tech-chip">📦 python-dotenv (.env Config)</div>
+    </div>
+
+    <!-- ── NIT Delhi ─────────────────────────── -->
+    <div class="section-title">🏛️ Institute</div>
+    <div class="nit-box">
+        <div class="nit-emblem">🏛️</div>
+        <div class="nit-info">
+            <h3>National Institute of Technology Delhi</h3>
+            <p>
+                NIT Delhi is a premier Institution of National Importance established by the Government of India under the NIT Act 2007.
+                Located in New Delhi, it offers undergraduate, postgraduate, and doctoral programmes in Engineering, Sciences, and Management.
+                Ranked among the top technical institutions in India, NIT Delhi is known for its rigorous curriculum and cutting-edge research.
+                This project was developed as part of the B.Tech Computer Science & Engineering programme (Batch 2023–2027)
+                under the Software Engineering course <strong>(CSBB 254)</strong>.
+            </p>
+            <span class="nit-badge">🎓 B.Tech CSE · Batch 2023–27 · New Delhi, India</span>
+        </div>
+    </div>
+
+    <!-- ── Team ──────────────────────────────── -->
+    <div class="section-title">👨‍💻 Meet the Developers</div>
+    <div class="team-grid">
+
+        <div class="team-card">
+            <div class="team-avatar">SU</div>
+            <div class="team-name">Shazin Uchakavil</div>
+            <div class="team-role-title">Backend Architect & Security Lead</div>
+            <div class="team-institution">
+                <strong>National Institute of Technology Delhi</strong><br>
+                B.Tech — Computer Science & Engineering<br>
+                Batch 2023–27
+            </div>
+            <div class="team-skills">
+                <span class="skill-pill">FastAPI</span>
+                <span class="skill-pill">SQLAlchemy</span>
+                <span class="skill-pill">HMAC Security</span>
+                <span class="skill-pill">Python</span>
+                <span class="skill-pill">REST APIs</span>
+            </div>
+        </div>
+
+        <div class="team-card">
+            <div class="team-avatar">NA</div>
+            <div class="team-name">Nithin Abraham Shaji</div>
+            <div class="team-role-title">Full Stack Developer & UI Designer</div>
+            <div class="team-institution">
+                <strong>National Institute of Technology Delhi</strong><br>
+                B.Tech — Computer Science & Engineering<br>
+                Batch 2023–27
+            </div>
+            <div class="team-skills">
+                <span class="skill-pill">HTML/CSS</span>
+                <span class="skill-pill">Jinja2</span>
+                <span class="skill-pill">JavaScript</span>
+                <span class="skill-pill">jsQR</span>
+                <span class="skill-pill">UI/UX</span>
+            </div>
+        </div>
+
+        <div class="team-card">
+            <div class="team-avatar">PK</div>
+            <div class="team-name">Pratik Kumar Singh</div>
+            <div class="team-role-title">Database Engineer & QR Systems</div>
+            <div class="team-institution">
+                <strong>National Institute of Technology Delhi</strong><br>
+                B.Tech — Computer Science & Engineering<br>
+                Batch 2023–27
+            </div>
+            <div class="team-skills">
+                <span class="skill-pill">SQLite</span>
+                <span class="skill-pill">DB Design</span>
+                <span class="skill-pill">QR Crypto</span>
+                <span class="skill-pill">Python</span>
+                <span class="skill-pill">bcrypt</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── CTA ───────────────────────────────── -->
+    <div class="cta-strip">
+        <h3>Ready to mark your attendance? 📍</h3>
+        <p>Log in as a student to scan QR codes and view your attendance,<br>or log in as a teacher to generate QR codes and manage your class.</p>
+        <a href="/" class="cta-btn">🏠 Go to Home</a>
+    </div>
+
 </div>
 {% endblock %}

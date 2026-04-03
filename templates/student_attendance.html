@@ -1,49 +1,144 @@
 {% extends 'base.html' %}
 {% block content %}
-<div style="max-width: 900px; margin: 0 auto; padding: 20px;">
-    <h2>Attendance Record for {{ roll_number }}</h2>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--table-bg, #fff); color: var(--table-text, #222);">
-        <thead>
-            <tr style="background-color: var(--table-header-bg, #f4f4f4); color: var(--table-header-text, #222);">
-                <th style="padding: 10px; border: 1px solid #ddd;">Subject Code</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">Total Classes</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">Attended</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">Attendance %</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for code, data in attendance_data.items() %}
-            <tr>
-                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ code }}</td>
-                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ data.total }}</td>
-                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ data.attended }}</td>
-                <td style="padding: 10px; border: 1px solid #444; background: var(--table-bg, #fff); color: var(--table-text, #222);">{{ '%.2f'|format(data.percentage) }}%</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div style="max-width: 1100px; margin: 40px auto; padding: 0 20px;">
+    <!-- Header -->
+    <div style="margin-bottom: 40px;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em;">
+            Attendance <span style="color: var(--accent-color);">Dashboard</span>
+        </h1>
+        <p style="opacity: 0.7; font-size: 1.1rem;">Welcome back! Here is your attendance record for Roll: <span style="font-weight: 700; color: var(--accent-color);">{{ roll_number }}</span></p>
+    </div>
 
-    <!-- Dates Present Per Subject Section -->
-    <div style="margin-top: 40px; background: var(--table-bg, #fff); color: var(--table-text, #222); border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); padding: 20px;">
-        <h3 style="font-size: 1.5em;">Dates Present Per Subject</h3>
-        <div style="max-height: 220px; overflow-y: auto;">
-            {% for code, months in present_dates_by_subject_grouped.items() %}
-                <div style="margin-bottom: 25px;">
-                    <strong>{{ code }}:</strong>
-                    {% if months %}
-                        {% for month_label, days in months.items() %}
-                            <div style="margin-left: 15px; margin-top: 8px;">
-                                {{ month_label }}: {{ days|join(', ') }}
+    <!-- Attendance Table Card -->
+    <div class="glass-card" style="margin-bottom: 40px; padding: 0; overflow: hidden;">
+        <div style="padding: 24px; border-bottom: 1px solid var(--card-border); background: var(--table-header-bg);">
+            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Subject-wise Summary</h3>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; background: var(--table-header-bg); color: var(--table-header-text);">
+                        <th style="padding: 16px 24px; font-weight: 600; font-size: 14px;">Subject Code</th>
+                        <th style="padding: 16px 24px; font-weight: 600; font-size: 14px;">Total Classes</th>
+                        <th style="padding: 16px 24px; font-weight: 600; font-size: 14px;">Attended</th>
+                        <th style="padding: 16px 24px; font-weight: 600; font-size: 14px;">Attendance %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for code, data in attendance_data.items() %}
+                    <tr style="border-top: 1px solid var(--card-border); transition: background 0.2s;">
+                        <td style="padding: 16px 24px; font-weight: 600;">{{ code }}</td>
+                        <td style="padding: 16px 24px; opacity: 0.8;">{{ data.total }}</td>
+                        <td style="padding: 16px 24px; opacity: 0.8;">{{ data.attended }}</td>
+                        <td style="padding: 16px 24px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="flex: 1; height: 8px; background: var(--table-header-bg); border-radius: 4px; overflow: hidden; min-width: 100px;">
+                                    <div style="height: 100%; width: {{ data.percentage }}%; background: {% if data.percentage >= 75 %}#10b981{% elif data.percentage >= 60 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+                                </div>
+                                <span style="font-weight: 700; min-width: 50px;">{{ '%.1f'|format(data.percentage) }}%</span>
                             </div>
-                        {% endfor %}
-                    {% else %}
-                        <div style="margin-left: 15px; margin-top: 8px; color: #ff0000;">No present dates found.</div>
-                    {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 32px;">
+        <!-- Calendar Section -->
+        <div class="glass-card" style="padding: 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h3 id="calendarMonth" style="margin: 0; font-size: 1.25rem; font-weight: 800;">Month Year</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button id="prevMonth" class="btn-nav">←</button>
+                    <button id="nextMonth" class="btn-nav">→</button>
                 </div>
-            {% endfor %}
+            </div>
+            
+            <table style="width: 100%; border-collapse: separate; border-spacing: 6px;">
+                <thead>
+                    <tr style="text-align: center; opacity: 0.5; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody">
+                    <!-- JS populated -->
+                </tbody>
+            </table>
+
+            <div style="margin-top: 24px; display: flex; gap: 16px; font-size: 12px; font-weight: 600;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 12px; height: 12px; background: #10b981; border-radius: 3px;"></div> Present
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 12px; height: 12px; background: #ef4444; border-radius: 3px;"></div> Absent
+                </div>
+            </div>
+        </div>
+
+        <!-- Dates Present Per Subject -->
+        <div class="glass-card" style="padding: 32px;">
+            <h3 style="margin: 0 0 24px; font-size: 1.25rem; font-weight: 800;">Presence History</h3>
+            <div style="max-height: 400px; overflow-y: auto; padding-right: 12px;">
+                {% for code, months in present_dates_by_subject_grouped.items() %}
+                    <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--card-border);">
+                        <div style="font-weight: 700; color: var(--accent-color); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.2rem;">📘</span> {{ code }}
+                        </div>
+                        {% if months %}
+                            {% for month_label, days in months.items() %}
+                                <div style="margin-bottom: 8px;">
+                                    <span style="font-weight: 600; font-size: 13px; opacity: 0.7;">{{ month_label }}:</span>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+                                        {% for day in days %}
+                                            <span style="background: var(--table-header-bg); padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">{{ day }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="font-size: 13px; opacity: 0.5; font-style: italic;">No attendance recorded yet.</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .btn-nav {
+        background: var(--table-header-bg);
+        border: none;
+        color: var(--text-color);
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s;
+    }
+    .btn-nav:hover {
+        background: var(--accent-color);
+        color: white;
+    }
+    
+    /* Scrollbar Styling */
+    div::-webkit-scrollbar {
+        width: 6px;
+    }
+    div::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    div::-webkit-scrollbar-thumb {
+        background: var(--card-border);
+        border-radius: 10px;
+    }
+    div::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-color);
+    }
+</style>
 
 <script>
 const rollNumber = "{{ roll_number }}";
@@ -52,7 +147,7 @@ const calendarBody = document.getElementById('calendarBody');
 const prevMonthBtn = document.getElementById('prevMonth');
 const nextMonthBtn = document.getElementById('nextMonth');
 
-let currentYear, currentMonth; // JS month: 0-indexed
+let currentYear, currentMonth;
 
 function getMonthName(year, month) {
     const d = new Date(year, month, 1);
@@ -69,46 +164,43 @@ function renderCalendar(year, month) {
             const lastDayOfMonth = new Date(year, month + 1, 0);
             const daysInMonth = lastDayOfMonth.getDate();
             const startDay = firstDayOfMonth.getDay();
-            let dayCounter = 1; // Proper counter that persists through loops
+            let dayCounter = 1;
             let attendanceMap = {};
             data.days.forEach(day => attendanceMap[day.day] = day.status);
+            
             for (let row = 0; row < 6; row++) {
                 const tr = document.createElement('tr');
+                let hasCells = false;
                 for (let col = 0; col < 7; col++) {
                     const td = document.createElement('td');
-                    td.style.border = '1px solid #222';
-                    td.style.width = '32px';
-                    td.style.height = '32px';
+                    td.style.width = '40px';
+                    td.style.height = '40px';
                     td.style.textAlign = 'center';
-                    td.style.verticalAlign = 'middle';
+                    td.style.borderRadius = '8px';
                     td.style.fontSize = '14px';
-                    td.style.fontWeight = 'normal';
+                    td.style.fontWeight = '600';
+                    
                     if (row === 0 && col < startDay) {
                         td.textContent = '';
-                        td.style.background = '#fff';
                     } else if (dayCounter <= daysInMonth) {
+                        hasCells = true;
                         td.textContent = dayCounter;
-                        const status = attendanceMap[dayCounter] || 'no-class';
+                        const status = attendanceMap[dayCounter] || 'none';
                         if (status === 'present') {
-                            td.style.backgroundColor = '#27ae60'; // Strong green
-                            td.style.color = '#fff';
-                            td.style.fontWeight = 'bold';
+                            td.style.background = '#10b981';
+                            td.style.color = 'white';
                         } else if (status === 'absent') {
-                            td.style.backgroundColor = '#ffe6e6';
-                            td.style.color = '#cc0000';
-                            td.style.fontWeight = 'bold';
+                            td.style.background = '#ef4444';
+                            td.style.color = 'white';
                         } else {
-                            td.style.backgroundColor = '#fff';
-                            td.style.color = '#222';
+                            td.style.background = 'var(--table-header-bg)';
+                            td.style.opacity = '0.5';
                         }
                         dayCounter++;
-                    } else {
-                        td.textContent = '';
-                        td.style.background = '#fff';
                     }
                     tr.appendChild(td);
                 }
-                calendarBody.appendChild(tr);
+                if (hasCells || row === 0) calendarBody.appendChild(tr);
             }
         });
 }
@@ -125,7 +217,6 @@ function changeMonth(offset) {
     renderCalendar(currentYear, currentMonth);
 }
 
-// Initialize to current month
 const today = new Date();
 currentYear = today.getFullYear();
 currentMonth = today.getMonth();

@@ -1,70 +1,101 @@
 {% extends 'base.html' %}
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
-    <h2 style="color: var(--dropdown-text);">QR Attendance - {{ course_code }}</h2>
-    
-    <div style="margin: 20px 0; padding: 20px; background: var(--dropdown-bg); border: 1px solid var(--dropdown-hover); border-radius: 5px; color: var(--dropdown-text);">
-        <h3 style="color: var(--dropdown-text);">Generate QR Code</h3>
-        <form method="post" action="/teacher/generate-qr/{{ course_code }}" style="display: flex; gap: 10px; align-items: flex-end;">
-            <div>
-                <label for="attendance_date" style="color: var(--dropdown-text);">Date:</label><br>
-                <input type="date" id="attendance_date" name="attendance_date" required 
-                       value="{{ today_date }}"
-                       style="padding: 8px; border: 1px solid var(--dropdown-hover); border-radius: 4px; background: var(--dropdown-bg); color: var(--dropdown-text);">
-            </div>
-            <div>
-                <label for="validity_minutes" style="color: var(--dropdown-text);">Valid for:</label><br>
-                <select id="validity_minutes" name="validity_seconds" required 
-                        style="padding: 8px; border: 1px solid var(--dropdown-hover); border-radius: 4px; background: var(--dropdown-bg); color: var(--dropdown-text);">
-                    <option value="60">1 minute</option>
-                    <option value="120">2 minutes</option>
-                </select>
-            </div>
-            <button type="submit" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                Generate New QR
-            </button>
-        </form>
-    </div>
-
-    {% if qr_code %}
-    <div style="margin: 20px 0; text-align: center; padding: 20px; border: 1px solid var(--dropdown-hover); border-radius: 5px; background-color: var(--dropdown-bg);">
-        <h3 style="color: var(--dropdown-text);">Active QR Code</h3>
-        <p style="color: var(--dropdown-text); margin-bottom: 15px;">Valid until: {{ qr_expiry }}</p>
-        <div style="background: var(--dropdown-bg); padding: 20px; display: inline-block; border-radius: 5px;">
-            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" 
-                 style="max-width: 300px; width: 100%; height: auto; display: block; margin: 0 auto;">
+<div style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+    <!-- Header -->
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em;">
+                QR <span style="color: var(--accent-color);">Generator</span>
+            </h1>
+            <p style="opacity: 0.7; font-size: 1.1rem;">Active Course: <span style="font-weight: 700; color: var(--accent-color);">{{ course_code }}</span></p>
         </div>
-        <p style="color: var(--dropdown-text); margin-top: 15px;">Students must be on the same network to mark attendance</p>
+        <div style="background: rgba(59, 130, 246, 0.1); padding: 8px 16px; border-radius: 50px; font-size: 14px; font-weight: 700; color: var(--accent-color); border: 1px solid rgba(59, 130, 246, 0.2);">
+            📡 Security Level: HMAC-Signed
+        </div>
     </div>
-    {% endif %}
 
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px;">
+        <!-- QR Generation Form -->
+        <div class="glass-card" style="padding: 32px; height: fit-content;">
+            <h3 style="margin: 0 0 24px; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5rem;">⚙️</span> Configuration
+            </h3>
+            <form method="post" action="/teacher/generate-qr/{{ course_code }}" style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <label for="attendance_date" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; opacity: 0.8;">Session Date</label>
+                    <input type="date" id="attendance_date" name="attendance_date" required 
+                           value="{{ selected_date or today_date }}"
+                           style="width: 100%; padding: 12px 16px; font-size: 15px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-color);">
+                </div>
+                <div>
+                    <label for="validity_minutes" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; opacity: 0.8;">QR Validity Window</label>
+                    <select id="validity_minutes" name="validity_seconds" required 
+                            style="width: 100%; padding: 12px 16px; font-size: 15px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-color); cursor: pointer;">
+                        <option value="60">60 Seconds (Ultra Secure)</option>
+                        <option value="120" selected>120 Seconds (Standard)</option>
+                        <option value="300">5 Minutes (Extended)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 14px;">
+                    Generate Secure QR
+                </button>
+            </form>
+        </div>
+
+        <!-- Active QR Display -->
+        <div class="glass-card" style="padding: 32px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+            {% if qr_code %}
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #10b981; animation: blink 1.5s infinite;"></div>
+                <h3 style="margin: 0 0 8px; font-size: 1.25rem; font-weight: 800; color: #10b981;">Active Token</h3>
+                <p style="font-size: 13px; opacity: 0.6; margin-bottom: 24px;">Automatically expires at: <span style="font-weight: 700; color: var(--text-color);">{{ qr_expiry }}</span></p>
+                
+                <div style="background: white; padding: 24px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: inline-block;">
+                    <img src="data:image/png;base64,{{ qr_code }}" alt="Secure QR Code" 
+                         style="width: 240px; height: 240px; display: block; filter: contrast(110%);">
+                </div>
+                
+                <p style="margin-top: 24px; font-size: 12px; font-weight: 600; opacity: 0.5; max-width: 240px;">Students must be on the classroom subnet to validate this token.</p>
+            {% else %}
+                <div style="font-size: 64px; opacity: 0.1; margin-bottom: 16px;">🎟️</div>
+                <h3 style="margin: 0; font-size: 1.1rem; opacity: 0.5;">No active session</h3>
+                <p style="font-size: 13px; opacity: 0.4;">Configure settings and generate a code to start taking attendance.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Live Status Table -->
     {% if attendance_records %}
-    <div style="margin: 20px 0;">
-        <h3 style="color: var(--dropdown-text);">Attendance for {{ selected_date }}</h3>
+    <div class="glass-card" style="margin-top: 48px; padding: 0; overflow: hidden;">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--card-border); background: var(--table-header-bg); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Live Feed: {{ selected_date_display or selected_date }}</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6;">Auto-refreshing</span>
+            </div>
+        </div>
         <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="background-color: var(--table-header-bg); color: var(--table-header-text);">
-                        <th style="padding: 12px; text-align: left; border: 1px solid var(--dropdown-hover);">Roll Number</th>
-                        <th style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover);">Status</th>
-                        <th style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover);">Time</th>
+                    <tr style="text-align: left; background: var(--table-header-bg); color: var(--table-header-text);">
+                        <th style="padding: 16px 24px; font-weight: 600; font-size: 13px;">Roll Number</th>
+                        <th style="padding: 16px 24px; font-weight: 600; font-size: 13px; text-align: center;">Presence Status</th>
+                        <th style="padding: 16px 24px; font-weight: 600; font-size: 13px; text-align: right;">Scan Time</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in attendance_records %}
-                    <tr>
-                        <td style="padding: 12px; border: 1px solid var(--dropdown-hover); color: var(--dropdown-text);">{{ record.roll_number }}</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover); color: var(--dropdown-text);">
+                    <tr style="border-top: 1px solid var(--card-border); transition: background 0.2s;">
+                        <td style="padding: 14px 24px; font-weight: 600;">{{ record.roll_number }}</td>
+                        <td style="padding: 14px 24px; text-align: center;">
                             {% if record.present %}
-                            <span style="color: var(--success-color);">Present</span>
+                            <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.2);">Present</span>
                             {% else %}
-                            <span style="color: var(--error-color);">Absent</span>
+                            <span style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.2); opacity: 0.5;">Absent</span>
                             {% endif %}
                         </td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid var(--dropdown-hover); color: var(--dropdown-text);">
-                            {{ record.time if record.present else '-' }}
+                        <td style="padding: 14px 24px; text-align: right; font-family: monospace; opacity: 0.6; font-size: 13px;">
+                            {{ record.time if record.present else '-- : -- : --' }}
                         </td>
-
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -74,12 +105,24 @@
     {% endif %}
 </div>
 
+<style>
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.5); opacity: 0.5; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+
 <script>
-// Auto-refresh the page every 30 seconds to update attendance records
+// Auto-refresh the page every 15 seconds for live feed
 setInterval(function() {
-    if (!document.hidden) {  // Only refresh if page is visible
+    if (!document.hidden) {
         location.reload();
     }
-}, 30000);
+}, 15000);
 </script>
 {% endblock %}

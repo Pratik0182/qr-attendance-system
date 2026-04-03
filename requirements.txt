@@ -5,3 +5,5 @@ jinja2
 qrcode[pil]
 passlib[bcrypt]
 python-multipart
+python-dotenv
+itsdangerous
