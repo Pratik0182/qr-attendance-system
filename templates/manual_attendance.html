@@ -1,64 +1,147 @@
 {% extends 'base.html' %}
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
-    <h2>Manual Attendance - {{ course_code }}</h2>
-    
-    <div style="margin: 20px 0; padding: 20px; background: var(--dropdown-bg); border: 1px solid var(--dropdown-hover); border-radius: 5px; color: var(--dropdown-text);">
-        <h3>Select Date</h3>
-        <form method="post" action="/teacher/manual-attendance/{{ course_code }}" style="display: flex; gap: 10px; align-items: flex-end;">
-            <div>
-                <label for="attendance_date">Date:</label><br>
+<div style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+    <!-- Header -->
+    <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em;">
+                Manual <span style="color: #10b981;">Registry</span>
+            </h1>
+            <p style="opacity: 0.7; font-size: 1.1rem;">Updating records for: <span style="font-weight: 700; color: #10b981;">{{ course_code }}</span></p>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 8px 16px; border-radius: 50px; font-size: 14px; font-weight: 700; color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+            ✍️ Manual Override Mode
+        </div>
+    </div>
+
+    <!-- Date Selection Tool -->
+    <div class="glass-card" style="padding: 32px; margin-bottom: 48px; border-left: 6px solid #10b981;">
+        <h3 style="margin: 0 0 20px; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.4rem;">📅</span> Select Registry Date
+        </h3>
+        <form method="post" action="/teacher/manual-attendance/{{ course_code }}" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <label for="attendance_date" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; opacity: 0.8;">Target Date</label>
                 <input type="date" id="attendance_date" name="attendance_date" required 
                        value="{{ attendance_date if attendance_date else '' }}"
-                       style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                       style="width: 100%; padding: 12px 16px; font-size: 15px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-color);">
             </div>
-            <button type="submit" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                Load Students
+            <button type="submit" class="btn-primary" style="background: #10b981; padding: 12px 32px;">
+                Load Roster
             </button>
         </form>
     </div>
 
+    <!-- Attendance Form -->
     {% if attendance_date and students %}
-    <div style="margin: 20px 0;">
-        <h3>Mark Attendance for {{ attendance_date }}</h3>
-        <form method="post" action="/teacher/mark-attendance/{{ course_code }}" style="margin-top: 15px;">
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <form method="post" action="/teacher/mark-attendance/{{ course_code }}">
             <input type="hidden" name="attendance_date" value="{{ attendance_date }}">
             
-            <div style="margin-bottom: 10px;">
-                <button type="button" onclick="selectAll(true)" style="padding: 5px 10px; margin-right: 10px;">Select All</button>
-                <button type="button" onclick="selectAll(false)" style="padding: 5px 10px;">Clear All</button>
+            <div style="padding: 24px; border-bottom: 1px solid var(--card-border); background: var(--table-header-bg); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Roster for {{ attendance_date }}</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" onclick="selectAll(true)" 
+                            style="background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); padding: 6px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        Select All
+                    </button>
+                    <button type="button" onclick="selectAll(false)" 
+                            style="background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 6px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        Clear All
+                    </button>
+                </div>
             </div>
 
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background-color: var(--table-header-bg); color: var(--table-header-text);">
-                        <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Roll Number</th>
-                        <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Present</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td style="padding: 12px; border: 1px solid #ddd;">{{ student.roll_number }}</td>
-                        <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">
-                            <input type="checkbox" name="present_{{ student.roll_number }}" 
-                                   class="attendance-checkbox"
-                                   {% if student.is_present %}checked{% endif %}
-                                   style="width: 20px; height: 20px; cursor: pointer;">
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div style="margin-top: 20px; text-align: right;">
-                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Save Attendance
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; background: var(--table-header-bg); color: var(--table-header-text);">
+                            <th style="padding: 16px 24px; font-weight: 600; font-size: 14px;">Student Roll Number</th>
+                            <th style="padding: 16px 24px; font-weight: 600; font-size: 14px; text-align: center;">Presence Toggle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr style="border-top: 1px solid var(--card-border); transition: background 0.2s;">
+                            <td style="padding: 14px 24px; font-weight: 600;">{{ student.roll_number }}</td>
+                            <td style="padding: 14px 24px; text-align: center;">
+                                <label class="custom-checkbox">
+                                    <input type="checkbox" name="present_{{ student.roll_number }}" 
+                                           class="attendance-checkbox"
+                                           {% if student.is_present %}checked{% endif %}>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="padding: 32px; background: var(--table-header-bg); border-top: 1px solid var(--card-border); text-align: right;">
+                <button type="submit" class="btn-primary" style="background: #10b981; padding: 14px 48px; border-radius: 12px; font-size: 16px;">
+                    Commit Changes to Database
                 </button>
             </div>
         </form>
     </div>
     {% endif %}
 </div>
+
+<style>
+    /* Custom Checkbox Styling */
+    .custom-checkbox {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        font-size: 22px;
+        user-select: none;
+        width: 24px;
+        height: 24px;
+    }
+    .custom-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 24px;
+        width: 24px;
+        background-color: var(--bg-color);
+        border: 2px solid var(--card-border);
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+    .custom-checkbox:hover input ~ .checkmark {
+        border-color: #10b981;
+    }
+    .custom-checkbox input:checked ~ .checkmark {
+        background-color: #10b981;
+        border-color: #10b981;
+    }
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+    .custom-checkbox input:checked ~ .checkmark:after {
+        display: block;
+    }
+    .custom-checkbox .checkmark:after {
+        left: 8px;
+        top: 3px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+</style>
 
 <script>
 function selectAll(checked) {

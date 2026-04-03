@@ -1,32 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
-<div
-    style="max-width: 400px; margin: 80px auto 0; padding: 20px; display: flex; flex-direction: column; align-items: center;">
-    <h2 style="font-size: 2.2em; font-weight: bold; margin-bottom: 18px;">Teacher Login</h2>
-    {% if error %}
-    <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
-    {% endif %}
-    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
-        <div>
-            <label for="course_code" style="font-size: 1.3em;">Course Code:</label><br>
-            <select id="course_code" name="course_code" required
-                style="padding: 14px; width: 260px; margin-top: 5px; font-size: 1.3em;">
-                <option value="">Select Course Code</option>
-                <option value="CSBB 251: Computer Architecture and Organization">CSBB 251: Computer Architecture and
-                    Organization</option>
-                <option value="CSBB 252: Artificial Intelligence">CSBB 252: Artificial Intelligence</option>
-                <option value="CSBB 254: Software Engineering">CSBB 254: Software Engineering</option>
-                <option value="HMBB 251: Professional Communication">HMBB 251: Professional Communication</option>
-                <option value="ECBB 254: Communication Systems">ECBB 254: Communication Systems</option>
-                <option value="CSPB 200: Project II">CSPB 200: Project II</option>
-            </select>
+<div style="max-width: 440px; margin: 100px auto; padding: 0 20px;">
+    <div class="glass-card" style="padding: 40px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="font-size: 3rem; margin-bottom: 12px;">👨‍🏫</div>
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 8px;">Teacher Login</h2>
+            <p style="opacity: 0.7; font-size: 0.9rem;">Please select your course code to log in.</p>
         </div>
-        <div>
-            <button type="submit"
-                style="padding: 15px 110px; background-color: #2196F3; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 1.15em;">
-                Login
+
+        {% if error %}
+        <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.2);">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <label for="course_code" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; opacity: 0.9;">Choose Course Code</label>
+                <select id="course_code" name="course_code" required
+                        style="width: 100%; padding: 14px 16px; font-size: 16px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; cursor: pointer;">
+                    <option value="" disabled selected>Select Course Code</option>
+                    {% for course in courses %}
+                    <option value="{{ course.code }}">{{ course.code }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; font-size: 16px; padding: 14px; background: #10b981;">
+                Access Dashboard
             </button>
+        </form>
+
+        <div style="margin-top: 24px; text-align: center; font-size: 13px; opacity: 0.6;">
+            Are you a student? <a href="/student/login" style="color: #10b981; font-weight: 600; text-decoration: none;">Login here</a>
         </div>
-    </form>
+    </div>
 </div>
+
+<style>
+    select:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    }
+</style>
 {% endblock %}

@@ -1,23 +1,43 @@
 {% extends 'base.html' %}
 {% block content %}
-<div style="max-width: 400px; margin: 80px auto 0; padding: 20px; display: flex; flex-direction: column; align-items: center;">
-    <h2 style="font-size: 2.2em; font-weight: bold; margin-bottom: 18px;">Student Login</h2>
-    {% if error %}
-    <div style="color: red; margin-bottom: 10px;">{{ error }}</div>
-    {% endif %}
-    <form method="post" style="display: flex; flex-direction: column; gap: 15px;">
-        <div>
-            <label for="roll_number" style="font-size: 1.3em;">Roll Number:</label><br>
-            <input type="text" id="roll_number" name="roll_number" required 
-                   style="padding: 14px; width: 265px; margin-top: 5px; font-size: 1.3em;"
-                   placeholder="Enter roll number">
+<div style="max-width: 440px; margin: 100px auto; padding: 0 20px;">
+    <div class="glass-card" style="padding: 40px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="font-size: 3rem; margin-bottom: 12px;">👨‍🎓</div>
+            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 8px;">Student Login</h2>
+            <p style="opacity: 0.7; font-size: 0.9rem;">Please enter your roll number to access your portal.</p>
         </div>
-        <div>
-            <button type="submit" 
-                    style="padding: 15px 122px; background-color: #4CAF50; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 1.3em;">
-                Login
+
+        {% if error %}
+        <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.2);">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <label for="roll_number" style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; opacity: 0.9;">Roll Number</label>
+                <input type="text" id="roll_number" name="roll_number" required 
+                       style="width: 100%; padding: 14px 16px; font-size: 16px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s;"
+                       placeholder="e.g. 231210066">
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; font-size: 16px; padding: 14px;">
+                Continue to Portal
             </button>
+        </form>
+
+        <div style="margin-top: 24px; text-align: center; font-size: 13px; opacity: 0.6;">
+            Are you a faculty member? <a href="/teacher/login" style="color: var(--accent-color); font-weight: 600; text-decoration: none;">Login here</a>
         </div>
-    </form>
+    </div>
 </div>
+
+<style>
+    input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
+</style>
 {% endblock %}

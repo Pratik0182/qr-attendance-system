@@ -1,50 +1,86 @@
 {% extends 'base.html' %}
 {% block content %}
-<div style="max-width: 600px; margin: 0 auto; text-align: center;">
-    <h2>Scan QR Code - {{ roll_number }}</h2>
-    
+<div style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.02em;">
+            Secure <span style="color: var(--accent-color);">Scanner</span>
+        </h1>
+        <p style="opacity: 0.7; font-size: 1.1rem;">Ready to mark attendance for: <span style="font-weight: 700; color: var(--accent-color);">{{ roll_number }}</span></p>
+    </div>
+
     {% if error %}
-    <div style="color: red; margin: 20px 0; padding: 10px; background-color: #ffebee; border-radius: 4px;">
-        {{ error }}
+    <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 16px; border-radius: 12px; margin-bottom: 32px; font-size: 14px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.2); font-weight: 600;">
+        ⚠️ {{ error }}
     </div>
     {% endif %}
 
     {% if success %}
-    <div style="color: green; margin: 20px 0; padding: 10px; background-color: #e8f5e9; border-radius: 4px;">
-        {{ success }}
+    <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 16px; border-radius: 12px; margin-bottom: 32px; font-size: 14px; text-align: center; border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 600;">
+        ✅ {{ success }}
     </div>
     {% endif %}
 
-    <div style="margin: 20px 0;">
-        <video id="video" style="width: 100%; max-width: 400px; border: 1px solid #ddd; border-radius: 4px;"></video>
-        <canvas id="canvas" style="display: none;"></canvas>
+    <!-- Scanner Interface -->
+    <div class="glass-card" style="padding: 24px; text-align: center; position: relative;">
+        <div style="position: relative; width: 100%; max-width: 400px; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+            <video id="video" style="width: 100%; display: block;"></video>
+            <canvas id="canvas" style="display: none;"></canvas>
+            
+            <!-- Scan Overlay -->
+            <div id="scan-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 40px solid rgba(0,0,0,0.5); pointer-events: none;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); animation: scanline 2.5s infinite linear;"></div>
+                <div style="width: 100%; height: 100%; border: 2px solid rgba(255,255,255,0.2); border-radius: 8px;"></div>
+            </div>
+            
+            <!-- Loading Indicator -->
+            <div id="loading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: #000; color: white;">
+                <div style="text-align: center;">
+                    <div style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 0.8s infinite linear; margin: 0 auto 16px;"></div>
+                    <span style="font-size: 12px; font-weight: 600; opacity: 0.6;">Initializing Camera...</span>
+                </div>
+            </div>
+        </div>
+        
+        <p style="margin-top: 24px; font-size: 14px; font-weight: 600; opacity: 0.7;">Align QR code within the frame to scan</p>
     </div>
 
-    <div style="margin: 20px 0;">
+    <!-- Manual Input Option -->
+    <div style="margin-top: 32px; text-align: center;">
+        <p style="font-size: 13px; opacity: 0.5; margin-bottom: 16px;">Having trouble scanning?</p>
         <form id="manual-form" method="post" action="/student/submit-attendance/{{ roll_number }}" 
-              style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-            <input type="hidden" id="student_lat" name="student_lat">
-            <input type="hidden" id="student_lon" name="student_lon">
+              style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
             <input type="text" id="qr-result" name="qr_token" required 
-                   style="padding: 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px; font-size: 16px;"
-                   placeholder="Enter QR Code manually">
-            <button type="button" onclick="submitWithLocation()" 
-                    style="padding: 12px 24px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 250px; font-size: 16px;">
-                Submit Code
+                   style="width: 100%; max-width: 300px; padding: 14px 16px; font-size: 14px; border-radius: 10px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-color); text-align: center;"
+                   placeholder="Paste token or enter manually">
+            <button type="submit" class="btn-primary" style="width: 100%; max-width: 300px; padding: 14px;">
+                Submit Attendance Code
             </button>
         </form>
-        <div id="location-status" style="margin-top: 10px; color: #666;"></div>
     </div>
 </div>
+
+<style>
+    @keyframes scanline {
+        0% { transform: translateY(0); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(320px); opacity: 0; }
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    #video:focus { outline: none; }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+const loading = document.getElementById('loading');
 let scanning = true;
 
-// Try to access the camera
 navigator.mediaDevices.getUserMedia({ 
     video: { 
         facingMode: 'environment',
@@ -54,42 +90,15 @@ navigator.mediaDevices.getUserMedia({
 })
 .then(function(stream) {
     video.srcObject = stream;
-    video.setAttribute('playsinline', true); // required for iOS
+    video.setAttribute('playsinline', true);
     video.play();
+    loading.style.display = 'none';
     requestAnimationFrame(tick);
 })
 .catch(function(err) {
     console.log("Camera access failed:", err);
-    document.getElementById('video').style.display = 'none';
-    document.getElementById('manual-form').style.display = 'flex';
+    loading.innerHTML = '<div style="color: #ef4444; padding: 20px;">Camera access denied. Please use the manual input below.</div>';
 });
-
-function submitWithLocation() {
-    const statusDiv = document.getElementById('location-status');
-    statusDiv.textContent = 'Getting location...';
-    
-    if (!navigator.geolocation) {
-        statusDiv.textContent = 'Geolocation is not supported by your browser';
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            document.getElementById('student_lat').value = position.coords.latitude;
-            document.getElementById('student_lon').value = position.coords.longitude;
-            document.getElementById('manual-form').submit();
-        },
-        (error) => {
-            statusDiv.textContent = 'Unable to get location. Please allow location access.';
-            console.error('Error getting location:', error);
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-        }
-    );
-}
 
 function tick() {
     if (!scanning) return;
@@ -105,7 +114,7 @@ function tick() {
         if (code) {
             scanning = false;
             document.getElementById('qr-result').value = code.data;
-            submitWithLocation();  // Get location before submitting
+            document.getElementById('manual-form').submit();
             return;
         }
     }
